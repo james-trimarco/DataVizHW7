@@ -14,15 +14,65 @@ library(readxl)
 library(httr)
 ```
 
-## Continuous variables
+## Continuous variable
 
-```{r pressure, echo=FALSE}
+### Import & format data
+```{r}
 GET('http://www.africapolis.org/download/Africapolis_agglomeration_2015.xlsx', 
     write_disk(africapolis <- tempfile(fileext = ".xls")))
+```
 
-a <- read_xlsx(africapolis, 
+```{r pressure, echo=FALSE}
+afr_cities <- read_xlsx(africapolis, 
                skip = 15, 
                col_types = c("text", "text", "text", rep("numeric", 7), 
                              "text", rep("numeric", 8)), 
                na = c('-', 'M', ''))
+
+afr_cities <- afr_cities %>%
+  rename(closest_metro = `Closest Metro`, 
+         dist_to_metro = `Distance to metro`)
 ```
+
+```{r}
+ggplot(afr_cities, aes(x = Population_2015, y = Builtup)) +
+  geom_point()
+```
+
+```{r}
+hub_cities <- afr_cities %>%
+  drop_na(closest_metro) %>%
+  group_by(closest_metro) %>%
+  summarize(n = n()) %>%
+  arrange(desc(n)) %>%
+  head(5)
+
+hub_cities
+```
+```{r fig.height= 6, fig.width=4}
+test <- afr_cities %>%
+  filter(closest_metro %in% hub_cities$closest_metro) %>%
+  filter(dist_to_metro > 0) %>%
+  filter(Population_2015 < 500000) 
+
+
+ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
+  theme_classic() +
+  scale_y_log10(labels = scales::comma) +
+  geom_point(color = "lightblue") +
+  geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE, color = "steelblue") +
+  facet_grid(rows = vars(factor(closest_metro)))
+
+?geom_smooth
+```
+
+```{r fig.height= 6, fig.width=4}
+ggplot(test, aes(x = Population_2015, y = Builtup)) +
+  theme_classic() +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_continuous(labels = scales::comma) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE) +
+  facet_grid(rows = vars(factor(closest_metro)))
+```
+
