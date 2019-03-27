@@ -7,20 +7,22 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Reading:
-  Read the R handout on plotly scatterplots
 
-## Project
+```{r cars}
+library(tidyverse)
+library(readxl)
+library(httr)
+```
 
-Each team needs to create a Github repository and invite me (Bernhard Klingenberg, bklingen@williams.edu) as a collaborator. Please name the repository "DataVizHW7".
-Each team then picks a dataset (or two different datasets) of their interest, briefly describes it and then creates an HTML file at least two `plotly` plots that visualize some interesting feature (or perhaps mundane feature) about their data. 
+## Continuous variables
 
-  - One of the plots should show the distribution of one continuous variable, conditional on one or two other variables. (If one of these two other variables is also continuous, you can show the relationship between two continuous variables, adjusted by a third categorical varaible.) This could be done in one graph, or via several subplots. 
-  
-  - The other plot should show the distribution of a categorical varaible, across one or two other categorical variables.
-  
-  
-I would like to see interactive graphs such as side-by-side (or overlayed) histograms or boxplots or violine plots, colored by different groups, side-by-side bar charts, either stacked or next to each other, for different groups, etc.
+```{r pressure, echo=FALSE}
+GET('http://www.africapolis.org/download/Africapolis_agglomeration_2015.xlsx', 
+    write_disk(africapolis <- tempfile(fileext = ".xls")))
 
-All team members should work on this project. I will check the commit history to see if this is the case.
-
+a <- read_xlsx(africapolis, 
+               skip = 15, 
+               col_types = c("text", "text", "text", rep("numeric", 7), 
+                             "text", rep("numeric", 8)), 
+               na = c('-', 'M', ''))
+```
