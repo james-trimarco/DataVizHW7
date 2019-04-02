@@ -267,9 +267,6 @@ plot_ly(us_sub, x = ~State, y = ~Black.Population,
 
 ```
 
-```{r}
-head(us_states)
-```
 
 ```{r}
 state_us_cities <- us_cities %>% filter(State %in% States)
@@ -297,7 +294,7 @@ data <- data.frame(States,BL_pop,BW_dis)
 p <- plot_ly(data,x=~States,y=~BL_pop,type='bar',name='BL Population') %>%
   add_trace(y=~BW_dis,name='Black/White Disparity') %>%
   add_trace(y=~WHpop,name='WH Population') %>%
-  layout(yaxis = list(title = 'Population'), barmode='group')
+  layout(yaxis = list(title = 'Population'),title='Black/White Disparity', barmode='group')
 p
 ```
 
