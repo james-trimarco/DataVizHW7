@@ -37,8 +37,8 @@ afr_cities <- afr_cities %>%
 ```
 
 ```{r}
-ggplot(afr_cities, aes(x = Population_2015, y = Builtup)) +
-  geom_point()
+# ggplot(afr_cities, aes(x = Population_2015, y = Builtup)) +
+#   geom_point()
 ```
 
 ```{r}
@@ -55,7 +55,7 @@ hub_cities
 # test <- afr_cities %>%
 #   filter(closest_metro %in% hub_cities$closest_metro) %>%
 #   filter(dist_to_metro > 0) %>%
-#   filter(Population_2015 < 500000) 
+#   filter(Population_2015 < 500000)
 # 
 # 
 # ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
@@ -78,42 +78,78 @@ hub_cities
 #   facet_grid(rows = vars(factor(closest_metro)))
 ```
 
-```{r}
+
+
+```{r fig.height=8, fig.width=4}
 color <- brewer.pal(4, "Set1")
 
-plots <- list
+# set up title formatting
+title <- list(
+  text = "Relationship Between Job Prestige of R and Spouse",
+  xref = "paper", yref = "paper",
+  yanchor = "bottom", xanchor = "left",
+  align = "left", x = 0, y = 1.2, 
+  showarrow = FALSE
+)
+
+plots <- list()
+idx <- 0
 for (hub in hub_cities$closest_metro){
-  print(hub)
+  idx <- idx + 1
+  
+  a <- list(
+    text = hub_cities$closest_metro[idx],
+    xref = "paper",
+    yref = "paper",
+    yanchor = "bottom",
+    xanchor = "center",
+    align = "center",
+    x = 0.5,
+    y = 1,
+    showarrow = FALSE
+  )
   
   data <- afr_cities %>%
-    filter(closest_metro == hub)
+    filter(closest_metro == hub) %>%
+    filter(dist_to_metro < 500) %>%
+    arrange(dist_to_metro)
 
-  p <- plot_ly(data, x = ~dist_to_metro, y = ~Builtup) %>%
+  #fit <- lm(Builtup ~ dist_to_metro, data = data)
+  fit <- lm(Population_2015 ~ dist_to_metro, data = data)
+   
+  p <- plot_ly(data, x = ~dist_to_metro, y = ~Population_2015, 
+               height = 800, width = 500) %>%
     
        add_trace(type = "scatter", mode = "markers", hoverinfo = 'text',
                   text = paste("Name of town: ", data$Agglomeration_Name, "<br>", 
-                           "Altitude: ", plot_data$Altitude),
-                  marker = list(size = 5, 
+                           "Altitude: ", data$Altitude),
+                  marker = list(size = 3, 
                                 color = color[1],
                                 opacity = .33), 
                   showlegend = FALSE) %>%
+     
+       add_trace(x = ~dist_to_metro, y = fitted(fit), mode = "lines",
+                  name = "",
+                  line = list(width = 2,
+                              color = color[2])) %>%
 
-    layout(yaxis = list(title = "Percent of Population",
-                        type = 'log',
+      layout(yaxis = list(title = "Population",
+                          range = c(3, 8),
+                          type = 'log',
+                        zeroline = FALSE), 
+           
+             xaxis = list(title = "Distance from Closest Metro",
                       zeroline = FALSE), 
            
-           xaxis = list(title = "Distance from Closest Metro",
-                      zeroline = FALSE))   #%>%
+           annotations = a)   #%>%
   
   plots <- c(plots, list(p)) 
 
 }
-
-
     
-subplot(plots[2:6], nrows = nrow(hub_cities), shareX = TRUE, titleX = TRUE)
-
-
+subplot(plots, nrows = nrow(hub_cities), shareX = TRUE, shareY = TRUE, titleY = TRUE, titleX = TRUE) %>%
+  layout(annotations = title, showlegend = FALSE) %>%
+  config(collaborate = FALSE, displaylogo = FALSE, displayModeBar = FALSE)
 ```
 
 #Categorical Variable
