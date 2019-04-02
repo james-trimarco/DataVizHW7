@@ -79,6 +79,8 @@ hub_cities
 ```
 
 ```{r}
+color <- brewer.pal(4, "Set1")
+
 plots <- list
 for (hub in hub_cities$closest_metro){
   print(hub)
@@ -86,13 +88,21 @@ for (hub in hub_cities$closest_metro){
   data <- afr_cities %>%
     filter(closest_metro == hub)
 
-  p <- plot_ly(data, x = ~dist_to_metro, y = ~Builtup, type = "scatter", 
-               #needs scale_y_log10
-               marker = list(size = 5,
-                        color = 'rgba(255, 182, 193, .9)')) %>%
+  p <- plot_ly(data, x = ~dist_to_metro, y = ~Builtup) %>%
+    
+       add_trace(type = "scatter", mode = "markers", hoverinfo = 'text',
+                  text = paste("Name of town: ", data$Agglomeration_Name, "<br>", 
+                           "Altitude: ", plot_data$Altitude),
+                  marker = list(size = 5, 
+                                color = color[1],
+                                opacity = .33), 
+                  showlegend = FALSE) %>%
+
     layout(yaxis = list(title = "Percent of Population",
                         type = 'log',
-                      ticksuffix = "%",
+                      zeroline = FALSE), 
+           
+           xaxis = list(title = "Distance from Closest Metro",
                       zeroline = FALSE))   #%>%
   
   plots <- c(plots, list(p)) 
@@ -101,7 +111,7 @@ for (hub in hub_cities$closest_metro){
 
 
     
-subplot(plots[2:6], nrows = nrow(hub_cities), shareX = TRUE, titleX = FALSE)
+subplot(plots[2:6], nrows = nrow(hub_cities), shareX = TRUE, titleX = TRUE)
 
 
 ```
