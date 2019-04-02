@@ -51,22 +51,7 @@ hub_cities <- afr_cities %>%
 
 hub_cities
 ```
-```{r fig.height= 6, fig.width=4}
-# test <- afr_cities %>%
-#   filter(closest_metro %in% hub_cities$closest_metro) %>%
-#   filter(dist_to_metro > 0) %>%
-#   filter(Population_2015 < 500000)
-# 
-# 
-# ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
-#   theme_classic() +
-#   scale_y_log10(labels = scales::comma) +
-#   geom_point(color = "lightblue") +
-#   geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE, color = "steelblue") +
-#   facet_grid(rows = vars(factor(closest_metro)))
-# 
-# ?geom_smooth
-```
+
 
 ```{r fig.height= 6, fig.width=4}
 # ggplot(test, aes(x = Population_2015, y = Builtup)) +
@@ -151,6 +136,23 @@ for (hub in hub_cities$closest_metro){
 subplot(plots, nrows = nrow(hub_cities), shareX = TRUE, shareY = TRUE, titleY = TRUE, titleX = TRUE) %>%
   layout(annotations = title, showlegend = FALSE) %>%
   config(collaborate = FALSE, displaylogo = FALSE, displayModeBar = FALSE)
+```
+
+# How it looks in GGplot for comparison
+
+```{r fig.height= 6, fig.width=4}
+test <- afr_cities %>%
+  filter(closest_metro %in% hub_cities$closest_metro) %>%
+  filter(dist_to_metro > 0) %>%
+  filter(Population_2015 < 500000)
+
+
+ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
+  theme_classic() +
+  scale_y_log10(labels = scales::comma) +
+  geom_point(color = "lightblue") +
+  geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE, color = "steelblue") +
+  facet_grid(rows = vars(factor(closest_metro)))
 ```
 
 #Categorical Variable
@@ -270,6 +272,7 @@ plot_ly(us_sub, x = ~State, y = ~Black.Population,
 
 
 ```{r}
+States <- c(' NY',' TX',' CA',' FL')
 state_us_cities <- us_cities %>% filter(State %in% States)
 head(state_us_cities)
 state_us_cities$Black.Population<-as.character(state_us_cities$Black.Population)
@@ -281,7 +284,7 @@ head(state_us_cities)
 ```
 
 ```{r}
-States <- c(' NY',' TX',' CA',' FL')
+
 BL <- state_us_cities %>% group_by(State) %>%
   summarise(BLpop = sum(Black.Population), WHpop = sum(White.Population..Non.Hispanic.),BWdis = mean(Black.White.Dissimilarity, na.rm = TRUE)*(BLpop+WHpop))
 BL
