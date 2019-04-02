@@ -225,3 +225,72 @@ plot_ly(us_sub, x = ~State, y = ~Black.Population,
 
 ```
 
+```{r echo=FALSE}
+violin_us <- us_states_long %>%
+  plot_ly(
+    x= ~State,
+    y= ~race,
+    split = ~race,
+    type='violin',
+    box=list(visible=TRUE)
+  ) %>%
+  layout(
+    xaxis = list(
+      title = "State"
+    )
+  )
+violin_us
+states=unique(us_states$State)
+bl_pops <- matrix(NA,length(states))
+#for (i in 1:length(states)){
+  times_val <- us_states_long %>% filter(State==states[i]) %>% filter(race=='Black.Population') %>% select(proportion)
+bl_pops[i] <- rep(x=states[i],times=times_val*10)
+#bl_pops<-cbind(matrix('BL',length(states)),)
+#}
+head(bl_pops)
+```
+
+```{r}
+state_us_cities <- us_cities %>% filter(State %in% States)
+head(state_us_cities)
+state_us_cities$Black.Population<-as.character(state_us_cities$Black.Population)
+state_us_cities$Black.Population<-as.numeric(gsub(',','',state_us_cities$Black.Population))
+state_us_cities$White.Population..Non.Hispanic.<-as.character(state_us_cities$White.Population..Non.Hispanic.)
+state_us_cities$White.Population..Non.Hispanic.<-as.numeric(gsub(',','',state_us_cities$White.Population..Non.Hispanic.))
+state_us_cities$Black.White.Dissimilarity<-as.numeric(state_us_cities$Black.White.Dissimilarity)
+head(state_us_cities)
+```
+
+```{r}
+States <- c(' NY',' TX',' CA',' FL')
+BL <- state_us_cities %>% group_by(State) %>%
+  summarise(BLpop = sum(Black.Population), WHpop = sum(White.Population..Non.Hispanic.),BWdis = mean(Black.White.Dissimilarity, na.rm = TRUE)*(BLpop+WHpop))
+BL
+
+BL_pop <- BL$BLpop
+BW_dis <- BL$BWdis
+WHpop <- BL$WHpop
+
+data <- data.frame(States,BL_pop,BW_dis)
+
+p <- plot_ly(data,x=~States,y=~BL_pop,type='bar',name='BL Population') %>%
+  add_trace(y=~BW_dis,name='Black/White Disparity') %>%
+  add_trace(y=~WHpop,name='WH Population') %>%
+  layout(yaxis = list(title = 'Population'), barmode='group')
+p
+```
+
+```{r}
+States <- c(' FL',' CA',' TX',' NY')
+BL_pop <- us_cities[us_cities$State %in% States,]
+BL_pop <- BL_pop[, -2]
+
+BL_states <- aggregate(.~ State, BL_pop, FUN=sum)
+BL_states
+
+```
+
+
+
+
+
