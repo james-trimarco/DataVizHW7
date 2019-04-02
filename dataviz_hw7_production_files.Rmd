@@ -166,7 +166,7 @@ plot_ly(us_states, x = ~State, y = ~Black.Population,
             marker=list(color = color[4])) %>%
   layout(margin = list(t = 80),
          barmode = 'stack', 
-         annotations = list(text = "Racial Breakdown of US States", 
+         annotations = list(text = "Racial Breakdown of Urban Areas in US States", 
                             showarrow = FALSE, 
                             font = list(size = 19), 
                             x = 0.5, 
@@ -185,6 +185,43 @@ plot_ly(us_states, x = ~State, y = ~Black.Population,
                   xanchor = "center", 
                   y = 1.12, 
                   yref = "paper")
+```
+
+##Looking at a sample of 5 random states
+Because there is data from 43 states, we decided to choose five random states to look at. Using this subset, we created a second chart below, which is easier to interpret.
+```{r}
+set.seed(1)
+index <- sample(1:nrow(us_states), 5)
+us_sub <- us_states[index,]
+
+plot_ly(us_sub, x = ~State, y = ~Black.Population, 
+        type = 'bar',
+        name = 'Black Population',
+        marker = list(color = color[1]),
+        text = paste("<b>State:</b>", us_sub$State, "<br><b>Sample Population:</b>", prettyNum(us_sub$TotalPop,big.mark=",",scientific=FALSE)),
+        hoverinfo = "text+y") %>%
+  add_trace(y = ~White.Population..Non.Hispanic., 
+            name = 'White Population',
+            marker=list(color = color[2])) %>%
+  add_trace(y = ~Hispanic.Population, 
+            name = 'Hispanic Population',
+            marker=list(color = color[3])) %>%
+  add_trace(y = ~Asian.Population, 
+            name = 'Asian Population',
+            marker=list(color = color[4])) %>%
+  layout(margin = list(t = 80),
+         barmode = 'stack', 
+         annotations = list(text = "Racial Breakdown of Urban Areas in Five US States", 
+                            showarrow = FALSE, 
+                            font = list(size = 19), 
+                            x = 0.5, 
+                            xref = "paper", 
+                            xanchor = "center", 
+                            y = 1.2, 
+                            yref = "paper"),
+         yaxis = list(title = "Percent of Population",
+                      ticksuffix = "%",
+                      zeroline = FALSE))
 
 ```
 
