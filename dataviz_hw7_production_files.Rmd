@@ -52,20 +52,20 @@ hub_cities <- afr_cities %>%
 hub_cities
 ```
 ```{r fig.height= 6, fig.width=4}
-test <- afr_cities %>%
-  filter(closest_metro %in% hub_cities$closest_metro) %>%
-  filter(dist_to_metro > 0) %>%
-  filter(Population_2015 < 500000)
-
-
-ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
-  theme_classic() +
-  scale_y_log10(labels = scales::comma) +
-  geom_point(color = "lightblue") +
-  geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE, color = "steelblue") +
-  facet_grid(rows = vars(factor(closest_metro)))
-
-?geom_smooth
+# test <- afr_cities %>%
+#   filter(closest_metro %in% hub_cities$closest_metro) %>%
+#   filter(dist_to_metro > 0) %>%
+#   filter(Population_2015 < 500000)
+# 
+# 
+# ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
+#   theme_classic() +
+#   scale_y_log10(labels = scales::comma) +
+#   geom_point(color = "lightblue") +
+#   geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE, color = "steelblue") +
+#   facet_grid(rows = vars(factor(closest_metro)))
+# 
+# ?geom_smooth
 ```
 
 ```{r fig.height= 6, fig.width=4}
@@ -78,41 +78,19 @@ ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
 #   facet_grid(rows = vars(factor(closest_metro)))
 ```
 
-```{r}
-# plot_ly(data = plot_data, x = ~prestg105plus, y = ~sppres105plus, 
-#         height = 500, width = 700) %>%
-#     
-#         add_trace(type = "scatter", mode = "markers", hoverinfo = 'text',
-#                   text = paste("R's prestige: ", plot_data$prestg105plus, "<br>", 
-#                            "Spouse's prestige: ", plot_data$sppres105plus),
-#                   marker = list(size = 5, 
-#                                 color = wes_palette("Zissou1")[1],
-#                                 opacity = .33), 
-#                   showlegend = FALSE) %>%
-#     
-#         add_trace(x = ~prestg105plus, y = fitted(fit), mode = "lines", 
-#                   name = "Smooth", 
-#                   line = list(width = 2, 
-#                               color = wes_palette("Zissou1")[4])) %>% etc etc
 
 
-# us_states_long <- gather(us_states, race, proportion, -State,-TotalPop)
-# 
-# head(us_states_long)
-# 
-# states=unique(us_states$State)
-# 
-# head(states)
-# bl_pops <- matrix(NA, length(states))
-# for (i in 1:length(states)) {
-# bl_pops[i] <- rep(x=states[i], times=as.integer(us_states_long[us_states_long$State==states[i] && 
-#                                                      us_states_long$race=='Black.Population',4]*10))
-# }
-```
-
-```{r}
+```{r fig.height=8, fig.width=4}
 color <- brewer.pal(4, "Set1")
 
+# set up title formatting
+title <- list(
+  text = "Relationship Between Job Prestige of R and Spouse",
+  xref = "paper", yref = "paper",
+  yanchor = "bottom", xanchor = "left",
+  align = "left", x = 0, y = 1.2, 
+  showarrow = FALSE
+)
 
 plots <- list()
 idx <- 0
@@ -133,16 +111,19 @@ for (hub in hub_cities$closest_metro){
   
   data <- afr_cities %>%
     filter(closest_metro == hub) %>%
-    arrange(desc(dist_to_metro))
-  
-  fit <- lm(Builtup ~ dist_to_metro, data = data)
+    filter(dist_to_metro < 500) %>%
+    arrange(dist_to_metro)
 
-  p <- plot_ly(data, x = ~dist_to_metro, y = ~Builtup) %>%
+  #fit <- lm(Builtup ~ dist_to_metro, data = data)
+  fit <- lm(Population_2015 ~ dist_to_metro, data = data)
+   
+  p <- plot_ly(data, x = ~dist_to_metro, y = ~Population_2015, 
+               height = 800, width = 500) %>%
     
        add_trace(type = "scatter", mode = "markers", hoverinfo = 'text',
                   text = paste("Name of town: ", data$Agglomeration_Name, "<br>", 
                            "Altitude: ", data$Altitude),
-                  marker = list(size = 5, 
+                  marker = list(size = 3, 
                                 color = color[1],
                                 opacity = .33), 
                   showlegend = FALSE) %>%
@@ -152,11 +133,12 @@ for (hub in hub_cities$closest_metro){
                   line = list(width = 2,
                               color = color[2])) %>%
 
-      layout(yaxis = list(title = "",
+      layout(yaxis = list(title = "Population",
+                          range = c(3, 8),
                           type = 'log',
                         zeroline = FALSE), 
            
-           xaxis = list(title = "Distance from Closest Metro",
+             xaxis = list(title = "Distance from Closest Metro",
                       zeroline = FALSE), 
            
            annotations = a)   #%>%
@@ -165,7 +147,9 @@ for (hub in hub_cities$closest_metro){
 
 }
     
-subplot(plots, nrows = nrow(hub_cities), shareX = TRUE, titleY = TRUE, titleX = TRUE) 
+subplot(plots, nrows = nrow(hub_cities), shareX = TRUE, shareY = TRUE, titleY = TRUE, titleX = TRUE) %>%
+  layout(annotations = title, showlegend = FALSE) %>%
+  config(collaborate = FALSE, displaylogo = FALSE, displayModeBar = FALSE)
 ```
 
 #Categorical Variable
