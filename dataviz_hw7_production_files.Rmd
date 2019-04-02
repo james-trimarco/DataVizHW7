@@ -136,6 +136,7 @@ for (hub in hub_cities$closest_metro){
       layout(yaxis = list(title = "Population",
                           range = c(3, 8),
                           type = 'log',
+                          exponentformat='E',
                         zeroline = FALSE), 
            
              xaxis = list(title = "Distance from Closest Metro",
