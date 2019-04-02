@@ -21,11 +21,11 @@ library(RColorBrewer)
 ### Import & format data
 ```{r}
 GET('http://www.africapolis.org/download/Africapolis_agglomeration_2015.xlsx', 
-    write_disk(africapolis <- tempfile(fileext = ".xls")))
+    write_disk(africapolis_impt <- tempfile(fileext = ".xls")))
 ```
 
 ```{r pressure, echo=FALSE}
-afr_cities <- read_xlsx(africapolis, 
+afr_cities <- read_xlsx(africapolis_impt, 
                skip = 15, 
                col_types = c("text", "text", "text", rep("numeric", 7), 
                              "text", rep("numeric", 8)), 
@@ -84,7 +84,10 @@ From https://www.governing.com/gov-data/residential-racial-segregation-metro-are
 
 ##Reading and formating the data
 ```{r}
-us_cities <- read.csv("segregation-national-download.csv")
+GET('http://images.centerdigitaled.com/documents/segregation-national-download.csv', 
+    write_disk(us_cities_impt <- tempfile(fileext = ".csv")))
+
+us_cities <- read.csv(us_cities_impt)
 
 #Separating city and state
 us_cities <- separate(data = us_cities, col = MSA, into = c("City", "State"), sep = ",")
