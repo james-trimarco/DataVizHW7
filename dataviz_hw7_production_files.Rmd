@@ -78,6 +78,27 @@ ggplot(test, aes(x = Population_2015, y = Builtup)) +
   facet_grid(rows = vars(factor(closest_metro)))
 ```
 
+```{r}
+plots <- list
+for (hub in hub_cities$closest_metro){
+  print(hub)
+  
+  data <- afr_cities %>%
+    filter(closest_metro == hub)
+
+  p <- plot_ly(data, x = ~dist_to_metro, y = ~Builtup, type = "scatter", 
+               marker = list(size = 10,
+                       color = 'rgba(255, 182, 193, .9)',
+                       line = list(color = 'rgba(152, 0, 0, .8)',
+                                   width = 2)))
+  
+  plots <- c(plots, list(p)) 
+
+}
+
+plots[2]
+subplot(plots[2:6])
+```
 
 #Categorical Variable
 From https://www.governing.com/gov-data/residential-racial-segregation-metro-areas.html 
