@@ -261,29 +261,8 @@ plot_ly(us_sub, x = ~State, y = ~Black.Population,
 
 ```
 
-```{r echo=FALSE}
-violin_us <- us_states_long %>%
-  plot_ly(
-    x= ~State,
-    y= ~race,
-    split = ~race,
-    type='violin',
-    box=list(visible=TRUE)
-  ) %>%
-  layout(
-    xaxis = list(
-      title = "State"
-    )
-  )
-violin_us
-states=unique(us_states$State)
-bl_pops <- matrix(NA,length(states))
-#for (i in 1:length(states)){
-  times_val <- us_states_long %>% filter(State==states[i]) %>% filter(race=='Black.Population') %>% select(proportion)
-bl_pops[i] <- rep(x=states[i],times=times_val*10)
-#bl_pops<-cbind(matrix('BL',length(states)),)
-#}
-head(bl_pops)
+```{r}
+head(us_states)
 ```
 
 ```{r}
@@ -315,18 +294,4 @@ p <- plot_ly(data,x=~States,y=~BL_pop,type='bar',name='BL Population') %>%
   layout(yaxis = list(title = 'Population'), barmode='group')
 p
 ```
-
-```{r}
-States <- c(' FL',' CA',' TX',' NY')
-BL_pop <- us_cities[us_cities$State %in% States,]
-BL_pop <- BL_pop[, -2]
-
-BL_states <- aggregate(.~ State, BL_pop, FUN=sum)
-BL_states
-
-```
-
-
-
-
 
