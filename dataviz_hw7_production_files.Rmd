@@ -52,30 +52,30 @@ hub_cities <- afr_cities %>%
 hub_cities
 ```
 ```{r fig.height= 6, fig.width=4}
-test <- afr_cities %>%
-  filter(closest_metro %in% hub_cities$closest_metro) %>%
-  filter(dist_to_metro > 0) %>%
-  filter(Population_2015 < 500000) 
-
-
-ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
-  theme_classic() +
-  scale_y_log10(labels = scales::comma) +
-  geom_point(color = "lightblue") +
-  geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE, color = "steelblue") +
-  facet_grid(rows = vars(factor(closest_metro)))
-
-?geom_smooth
+# test <- afr_cities %>%
+#   filter(closest_metro %in% hub_cities$closest_metro) %>%
+#   filter(dist_to_metro > 0) %>%
+#   filter(Population_2015 < 500000) 
+# 
+# 
+# ggplot(test, aes(x = dist_to_metro, y = Population_2015)) +
+#   theme_classic() +
+#   scale_y_log10(labels = scales::comma) +
+#   geom_point(color = "lightblue") +
+#   geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE, color = "steelblue") +
+#   facet_grid(rows = vars(factor(closest_metro)))
+# 
+# ?geom_smooth
 ```
 
 ```{r fig.height= 6, fig.width=4}
-ggplot(test, aes(x = Population_2015, y = Builtup)) +
-  theme_classic() +
-  scale_y_continuous(labels = scales::comma) +
-  scale_x_continuous(labels = scales::comma) +
-  geom_point() +
-  geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE) +
-  facet_grid(rows = vars(factor(closest_metro)))
+# ggplot(test, aes(x = Population_2015, y = Builtup)) +
+#   theme_classic() +
+#   scale_y_continuous(labels = scales::comma) +
+#   scale_x_continuous(labels = scales::comma) +
+#   geom_point() +
+#   geom_smooth(method = 'lm', formula = y ~ splines::bs(x, 3), se = FALSE) +
+#   facet_grid(rows = vars(factor(closest_metro)))
 ```
 
 ```{r}
@@ -87,17 +87,23 @@ for (hub in hub_cities$closest_metro){
     filter(closest_metro == hub)
 
   p <- plot_ly(data, x = ~dist_to_metro, y = ~Builtup, type = "scatter", 
-               marker = list(size = 10,
-                       color = 'rgba(255, 182, 193, .9)',
-                       line = list(color = 'rgba(152, 0, 0, .8)',
-                                   width = 2)))
+               #needs scale_y_log10
+               marker = list(size = 5,
+                        color = 'rgba(255, 182, 193, .9)')) %>%
+    layout(yaxis = list(title = "Percent of Population",
+                        type = 'log',
+                      ticksuffix = "%",
+                      zeroline = FALSE))   #%>%
   
   plots <- c(plots, list(p)) 
 
 }
 
-plots[2]
-subplot(plots[2:6])
+
+    
+subplot(plots[2:6], nrows = nrow(hub_cities), shareX = TRUE, titleX = FALSE)
+
+
 ```
 
 #Categorical Variable
