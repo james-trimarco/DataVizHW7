@@ -37,8 +37,8 @@ afr_cities <- afr_cities %>%
 ```
 
 ```{r}
-ggplot(afr_cities, aes(x = Population_2015, y = Builtup)) +
-  geom_point()
+# ggplot(afr_cities, aes(x = Population_2015, y = Builtup)) +
+#   geom_point()
 ```
 
 ```{r}
@@ -79,11 +79,28 @@ hub_cities
 ```
 
 ```{r}
+
+```
+
+```{r}
 color <- brewer.pal(4, "Set1")
 
-plots <- list
+plots <- list()
+idx <- 0
 for (hub in hub_cities$closest_metro){
-  print(hub)
+  idx <- idx + 1
+  
+  a <- list(
+    text = hub_cities$closest_metro[idx],
+    xref = "paper",
+    yref = "paper",
+    yanchor = "bottom",
+    xanchor = "center",
+    align = "center",
+    x = 0.5,
+    y = 1,
+    showarrow = FALSE
+  )
   
   data <- afr_cities %>%
     filter(closest_metro == hub)
@@ -92,28 +109,26 @@ for (hub in hub_cities$closest_metro){
     
        add_trace(type = "scatter", mode = "markers", hoverinfo = 'text',
                   text = paste("Name of town: ", data$Agglomeration_Name, "<br>", 
-                           "Altitude: ", plot_data$Altitude),
+                           "Altitude: ", data$Altitude),
                   marker = list(size = 5, 
                                 color = color[1],
                                 opacity = .33), 
                   showlegend = FALSE) %>%
 
-    layout(yaxis = list(title = "Percent of Population",
+    layout(yaxis = list(title = "",
                         type = 'log',
                       zeroline = FALSE), 
            
            xaxis = list(title = "Distance from Closest Metro",
-                      zeroline = FALSE))   #%>%
+                      zeroline = FALSE), 
+           
+           annotations = a)   #%>%
   
   plots <- c(plots, list(p)) 
 
 }
-
-
     
-subplot(plots[2:6], nrows = nrow(hub_cities), shareX = TRUE, titleX = TRUE)
-
-
+subplot(plots, nrows = nrow(hub_cities), shareX = TRUE, titleY = TRUE, titleX = TRUE) 
 ```
 
 #Categorical Variable
